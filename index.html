@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>초6 사회 핵심 퀴즈 도전!</title>
+    <style>
+        body { font-family: 'Nanum Gothic', sans-serif; background-color: #f0f8ff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .quiz-container { background-color: white; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 600px; }
+        h1 { text-align: center; color: #2c3e50; font-size: 1.5rem; }
+        .question { font-size: 1.2rem; margin-bottom: 1.5rem; font-weight: bold; color: #34495e; }
+        .options { display: grid; gap: 10px; }
+        button { padding: 12px; font-size: 1rem; border: 2px solid #3498db; border-radius: 8px; background-color: white; cursor: pointer; transition: 0.3s; }
+        button:hover { background-color: #3498db; color: white; }
+        .feedback { margin-top: 1.5rem; padding: 10px; border-radius: 8px; display: none; text-align: center; font-weight: bold; }
+        .correct { background-color: #d4edda; color: #155724; }
+        .incorrect { background-color: #f8d7da; color: #721c24; }
+        #next-btn { margin-top: 1rem; width: 100%; background-color: #2ecc71; color: white; border: none; display: none; }
+        #result-area { text-align: center; display: none; }
+        .progress { text-align: right; font-size: 0.9rem; color: #7f8c8d; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="quiz-area">
+        <div class="progress" id="progress">문제 1 / 5</div>
+        <h1>🌍 초6 사회 퀴즈</h1>
+        <div class="question" id="question">문제가 여기에 나타납니다.</div>
+        <div class="options" id="options-container">
+            </div>
+        <div id="feedback" class="feedback"></div>
+        <button id="next-btn" onclick="nextQuestion()">다음 문제로 👉</button>
+    </div>
+
+    <div id="result-area">
+        <h2>🎉 퀴즈 종료!</h2>
+        <p id="score-text"></p>
+        <button onclick="location.reload()" style="background-color: #34495e; color: white;">다시 도전하기</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            q: "1. 다음 중 대한민국 국민의 '4대 의무'가 아닌 것은?",
+            a: ["교육의 의무", "납세의 의무", "투표의 의무", "근로의 의무"],
+            correct: 2,
+            info: "투표는 국민의 소중한 '권리'입니다."
+        },
+        {
+            q: "2. 1960년 부정 선거에 항거하여 일어난 민주화 운동은?",
+            a: ["5·18 민주화 운동", "4·19 혁명", "6월 민주 항쟁", "3·1 운동"],
+            correct: 1,
+            info: "4·19 혁명은 시민들의 힘으로 독재 정권을 퇴진시킨 사건입니다."
+        },
+        {
+            q: "3. 국가 권력을 입법, 행정, 사법부로 나누는 원리는?",
+            a: ["지방 자치", "국민 주권", "삼권 분립", "자유 민주주의"],
+            correct: 2,
+            info: "권력 남용을 막기 위해 셋(삼권)으로 나눕니다."
+        },
+        {
+            q: "4. 우리나라 경제의 특징으로 기업들이 자유롭게 겨루는 것은?",
+            a: ["경제 계획", "자유로운 경쟁", "무역 규제", "국가 주도"],
+            correct: 1,
+            info: "우리나라는 자유로운 경쟁과 창의를 존중하는 경제 체제를 갖고 있습니다."
+        },
+        {
+            q: "5. 독도는 행정 구역상 어디에 속해 있나요?",
+            a: ["강원도 울릉군", "경상북도 울릉군", "제주특별자치도", "전라남도 신안군"],
+            correct: 1,
+            info: "독도는 대한민국 경상북도 울릉군에 속한 우리 땅입니다."
+        }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+
+    function loadQuiz() {
+        const qData = quizData[currentIdx];
+        document.getElementById('progress').innerText = `문제 ${currentIdx + 1} / ${quizData.length}`;
+        document.getElementById('question').innerText = qData.q;
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+        
+        qData.a.forEach((text, i) => {
+            const btn = document.createElement('button');
+            btn.innerText = text;
+            btn.onclick = () => checkAnswer(i);
+            optionsContainer.appendChild(btn);
+        });
+
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+    }
+
+    function checkAnswer(selected) {
+        const qData = quizData[currentIdx];
+        const feedback = document.getElementById('feedback');
+        const buttons = document.querySelectorAll('#options-container button');
+
+        buttons.forEach(btn => btn.disabled = true);
+
+        if (selected === qData.correct) {
+            feedback.innerText = "✅ 정답입니다! " + qData.info;
+            feedback.className = "feedback correct";
+            score++;
+        } else {
+            feedback.innerText = "❌ 틀렸습니다. 정답은 [" + qData.a[qData.correct] + "] 입니다.";
+            feedback.className = "feedback incorrect";
+        }
+
+        feedback.style.display = 'block';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentIdx++;
+        if (currentIdx < quizData.length) {
+            loadQuiz();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+        document.getElementById('score-text').innerText = `${quizData.length}문제 중 ${score}문제를 맞혔습니다!`;
+    }
+
+    loadQuiz();
+</script>
+
+</body>
+</html>
